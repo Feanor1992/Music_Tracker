@@ -2,12 +2,19 @@ import tkinter as tk
 import os
 import pandas as pd
 
-# list of listened albums
-albums = list()
+# dataframe of listened albums
+albums = pd.DataFrame(columns=['artist', 'album', 'year'])
+
+
+def read_albums():
+    global albums
+    albums = pd.read_csv('albums.csv', dtype={'year': int})
+    if albums.empty:
+        albums = pd.DataFrame(columns=['artist', 'album', 'year'])
 
 
 def add_album():
-    """add listened albums to list of dictionaries. Each dictionary will contain the following data
+    """add listened albums to dataframe, that contains the following data
     - artist: artist name
     - album - album name
     - year - year of publishing"""
@@ -24,12 +31,20 @@ def add_album():
         year = input('Input Year of publishing: ')
         return
 
-    # add album to the list
-    albums.append({
+    # check that album exists
+    for existing_album in albums.to_dict(orient='records'):
+        if existing_album['artist'] == artist and existing_album['album'] == album and existing_album['year'] == year:
+            print('You have listened this album')
+
+    # add album to the dataframe
+    albums.loc[len(albums)] = {
         'artist': artist,
         'album': album,
         'year': year
-    })
+    }
+
+    # save album to dataframe
+    albums.to_csv('albums.csv', index=False)
 
     print('Album successfully added to the list of listened albums')
 
@@ -40,16 +55,11 @@ def search_album():
     query = input('What are you searching? ')
 
     # search album by the name of artist, album or publishing year
-    result = list()
-
-    for album in albums:
-        if query in album['artist'] or query in album['album'] or query in album['year']:
-            result.append(album)
-
-    # return the result of searching
-    if len(result) == 0:
-        print('Album not found')
+    albums_found = albums.loc[albums['album'].str.contains(query)]
+    if not albums_found.empty:
+        print('Found this albums: ')
+        for album in albums_found.to_dict(orient='records'):
+            print(f'{album["artist"]} - {album["album"]} ({album["year"]}')
     else:
-        for album in result:
-            print(f'{album["artist"]} - {album["album"]} ({album["year"]})')
+        print('Album not found')
 
