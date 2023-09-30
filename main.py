@@ -1,7 +1,6 @@
 import tkinter as tk
 import os
 import pandas as pd
-import locale
 
 # dataframe of listened albums
 albums = pd.DataFrame(columns=['artist', 'album', 'year'])
@@ -12,10 +11,10 @@ books = pd.DataFrame(columns=['author', 'cycle', 'book'])
 
 def read_albums():
     global albums
-    if not os.path.isfile('albums.csv'):
+    if not os.path.isfile('albums.xlsx'):
         albums = pd.DataFrame(columns=['artist', 'album', 'year'])
     else:
-        albums = pd.read_csv('albums.csv', dtype={'year': int}, encoding='cp866')
+        albums = pd.read_excel('albums.xlsx', dtype={'year': int})
 
 
 def read_books():
@@ -31,8 +30,6 @@ def add_album():
     - artist: artist name
     - album - album name
     - year - year of publishing"""
-
-    locale.setlocale(locale.LC_ALL, "ru_RU")
 
     artist = input('Input Artist name: ').lower()
     album = input('Input Album name: ').lower()
@@ -50,16 +47,18 @@ def add_album():
     for existing_album in albums.to_dict(orient='records'):
         if existing_album['artist'] == artist and existing_album['album'] == album and existing_album['year'] == year:
             print('You have listened this album')
-        else:
-            # add album to the dataframe
-            albums.loc[len(albums)] = {
-                'artist': artist,
-                'album': album,
-                'year': year
-            }
-            # save album to dataframe
-            albums.to_csv('albums.csv', index=False, encoding='cp866')
-            print('Album successfully added to the list of listened albums')
+            return
+
+    # add album to the dataframe
+    albums.loc[len(albums)] = {
+       'artist': artist,
+       'album': album,
+       'year': year
+    }
+
+    # save album to dataframe
+    albums.to_excel('albums.xlsx', index=False)
+    print('Album successfully added to the list of listened albums')
 
 
 def add_book():
@@ -67,8 +66,6 @@ def add_book():
     - author: author name
     - cycle - name of cycle to which the book belongs
     - book - book name"""
-
-    # locale.setlocale(locale.LC_ALL, "ru_RU")
 
     author = input('Input Author name: ').lower()
     cycle = input('Input Cycle name: ').lower()
@@ -78,15 +75,17 @@ def add_book():
     for existing_book in books.to_dict(orient='records'):
         if existing_book['author'] == author and existing_book['cycle'] == cycle and existing_book['book'] == book:
             print('You have read this book')
-        else:
-            books.loc[len(books)] = {
-                'author': author,
-                'cycle': cycle,
-                'book': book
-            }
-            # save album to dataframe
-            books.to_excel('books.xlsx', index=False)
-            print('Book successfully added to the list')
+            return
+
+    books.loc[len(books)] = {
+        'author': author,
+        'cycle': cycle,
+        'book': book
+    }
+
+    # save album to dataframe
+    books.to_excel('books.xlsx', index=False)
+    print('Book successfully added to the list')
 
 
 def search_album():
@@ -119,6 +118,28 @@ def search_book():
         print('Book not found')
 
 
+def show_albums():
+    """function for showing albums in the list"""
+
+    if not albums.empty:
+        print('List of albums: ')
+        for album in albums.to_dict(orient='records'):
+            print(f'{album["artist"]} - {album["album"]} ({album["year"]})')
+    else:
+        print('Albums list is empty or not found')
+
+
+def show_books():
+    """function for showing books in the list"""
+
+    if not books.empty:
+        print('List of books: ')
+        for book in books.to_dict(orient='records'):
+            print(f'{book["artist"]} - {book["album"]} ({book["year"]})')
+    else:
+        print('Books list is empty or not found')
+
+
 def main():
     read_albums()
     read_books()
@@ -129,7 +150,9 @@ def main():
         print('2. Add book')
         print('3. Search album')
         print('4. Search book')
-        print('5. Exit')
+        print('5. Show list of albums')
+        print('6. Show list of books')
+        print('7. Exit')
 
         choice = input()
 
@@ -142,9 +165,13 @@ def main():
         elif choice == '4':
             search_book()
         elif choice == '5':
+            show_albums()
+        elif choice == '6':
+            show_books()
+        elif choice == '7':
             break
         else:
-            print('You must print numbers 1-5')
+            print('You must print numbers 1-7')
 
 
 if __name__ == '__main__':
