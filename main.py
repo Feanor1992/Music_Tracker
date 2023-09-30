@@ -123,7 +123,7 @@ def show_albums():
 
     if not albums.empty:
         print('List of albums: ')
-        for album in albums.to_dict(orient='records'):
+        for album in albums.sort_values(by=['artist'], ascending=True).to_dict(orient='records'):
             print(f'{album["artist"]} - {album["album"]} ({album["year"]})')
     else:
         print('Albums list is empty or not found')
@@ -134,8 +134,8 @@ def show_books():
 
     if not books.empty:
         print('List of books: ')
-        for book in books.to_dict(orient='records'):
-            print(f'{book["artist"]} - {book["album"]} ({book["year"]})')
+        for book in books.sort_values(by=['author'], ascending=True).to_dict(orient='records'):
+            print(f'{book["author"]} - {book["cycle"]}: ({book["book"]})')
     else:
         print('Books list is empty or not found')
 
