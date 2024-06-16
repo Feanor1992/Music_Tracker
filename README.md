@@ -35,3 +35,4 @@ Global Variables
 
 **Next Steps**
 - Add Edit Functionality: Implement the ability to edit existing albums in the list.
+- Add Sort Albums Functionality
